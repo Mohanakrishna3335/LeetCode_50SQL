@@ -15,8 +15,13 @@ This table contains information about the temperature on a certain day.
 Write a solution to find all dates' id with higher temperatures compared to its previous dates (yesterday).
 
 Return the result table in any order.*/
-with prev as 
-(select *,lag(temperature ,1 ) over(order by recordDate) as prev_temp from Weather)
-select id
-from prev 
-where temperature >prev_temp
+WITH prev AS (
+  SELECT *,
+         LAG(temperature) OVER (ORDER BY recordDate) AS prev_temp,
+         LAG(recordDate) OVER (ORDER BY recordDate) AS prev_date
+  FROM Weather
+)
+SELECT id
+FROM prev
+WHERE DATEDIFF(DAY, prev_date, recordDate) = 1
+  AND temperature > prev_temp;
